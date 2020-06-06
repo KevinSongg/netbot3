@@ -64,36 +64,29 @@ def play(botSocket, srvConf):
 # Standard stuff below.
 ##################################################################
 
-def binarySnipe(l,r):
-    if r>=l:
+def binarySnipe(length,radius):
+    if radius>=length:
         global currentMode
         global distance    
        
-        mid = l + (r-l)/2
-        if (mid <= l+1):
-            firedirection = ((((mid + l) /2) /128) *2 *math.pi)
+        mid = length + (radius-length)/2
+        if (mid <= length+1):
+            firedirection = ((((mid + length) /2) /128) *2 *math.pi)
             currentMode = "wait"
             botSocket.sendRecvMessage({'type':'fireCanonRequest','direction': firedirection,'distance' : distance})
-        elif (mid >= r - 1):
-            firedirection = ((((mid + r) /2) /128) *2 *math.pi)
+        elif (mid >= radius - 1):
+            firedirection = ((((mid + radius) /2) /128) *2 *math.pi)
             currentMode = "wait"
             botSocket.sendRecvMessage({'type':'fireCanonRequest','direction': firedirection,'distance' : distance})
-        scanReply = botSocket.sendRecvMessage({'type':'scanRequest','startRadians':(l/128)*2*math.pi,'endRadians':(mid/128)*2*math.pi})
+        scanReply = botSocket.sendRecvMessage({'type':'scanRequest','startRadians':(length/128)*2*math.pi,'endRadians':(mid/128)*2*math.pi})
         if(scanReply['distance'] != 0):
             distance = scanReply['distance']
-            return binarySnipe(l, mid-1)
+            return binarySnipe(length, mid-1)
         else:
-            return binarySnipe(mid+1, r)
+            return binarySnipe(mid+1, radius)
     else: 
         return -1
     
-def quit(signal=None, frame=None):
-    global botSocket
-    log(botSocket.getStats())
-    log("Quiting", "INFO")
-    exit()
-
-
 def main():
     global botSocket  # This is global so quit() can print stats in botSocket
     global robotName
